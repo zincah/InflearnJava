@@ -93,10 +93,12 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
 			
 		}
 
+		/*
 		if("bye".equals(realMsg.toLowerCase())){
-			System.out.println("종료");
+			System.out.println("server - 종료");
 			ctx.close();
-		}
+		}*/
+
 		
 
 	}

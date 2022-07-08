@@ -18,12 +18,17 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 
 public class ChatClient{
 	
+	// 예외처리
+	// BlockingOperationException
+	// ClosedChannelException
+	
 	// Bootstrap : netty로 작성한 네트워크 프로그램이 시작할 때 가장 먼저 수행
 	// -> 어플리케이션이 수행할 동작을 지정
 	// -> 프로그램에 대한 각종 설정을 지정
 	
 	static final String HOST = System.getProperty("server", "192.168.1.156"); // server ip 연결
 	static final int PORT = Integer.parseInt(System.getProperty("port", "8888")); // port 연결
+	static final int RECONNECT_DELAY = Integer.parseInt(System.getProperty("reconnectDelay", "5"));
 	
 	// 전문
 	private byte[] length = new byte[10];
@@ -32,7 +37,7 @@ public class ChatClient{
 		
 		try {
 			new ChatClient().run(); // run 메소드 실행
-		}catch(Exception e) {
+		}catch(NullPointerException e) {
 			System.out.println("종료"); // 그냥 강제 종료 버튼 눌렀을 때
 		}
 		 
@@ -63,35 +68,34 @@ public class ChatClient{
 			// 보낼 메세지 입력
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 			
-			for(;;) {
-				
+			while(channel.isActive()) { // 재접속하면 두번 돌아감 이걸 어떻게 멈추지...
+
 				Thread.sleep(1000);
-				System.out.print("데이터 입력 : ");
+				System.out.print("데이터 입력 : "); // 왜 한번 더 쳐야하는지를 모르겠음ㅜ
 				String line = br.readLine();
 				StringBuffer data = checkedDataProc(line);
 
+				if(line == null) {
+					break;
+				}
 				// bye 입력시 채팅 종료
 				if("bye".equals(line.toLowerCase())) {
 					channel.closeFuture().sync();
 					break;
 				}
-				
+				/*
 				if("quit".equals(data)) {
+					channel.closeFuture().sync();
 					break;
-				}
+				}*/
 				
 				// server로 전송
 				channelFuture = channel.writeAndFlush(data + "\n");
 
-				if(channelFuture.isDone()){ // 이거 안됨
-					System.out.println("채널 접속이 끊겼습니다. 다시 데이터를 입력하면 재접속을 시도합니다.");
-				}
-				
 			}
 			
 			// 모든 메세지가 flush 될때까지 기다린다.
 			if(channelFuture != null) {
-				System.out.println("flush");
 				channelFuture.sync(); 
 			}
 
@@ -104,11 +108,12 @@ public class ChatClient{
 	
 	public StringBuffer checkedDataProc(String line) throws Exception {
 		
+		/*
 		if(line == null) {
 			StringBuffer sb = new StringBuffer();
 			sb.append("quit");
 			return sb;
-		}else {
+		}else {*/
 			byte[] bytes = line.getBytes("euc-kr");
 			String len = String.valueOf(bytes.length);
 			
@@ -131,6 +136,6 @@ public class ChatClient{
 			sb.append(new String(bytes, "euc-kr"));
 			//sb.append("아");
 			return sb;
-		}
+		//}
 	}
 }

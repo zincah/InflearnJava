@@ -36,7 +36,7 @@ public class ChatClientInitializer extends ChannelInitializer<SocketChannel> {
 		pipeline.addLast(new StringDecoder()); // decoder 등록
 		pipeline.addLast(new StringEncoder()); // encoder 등록 -> string을 bytebuf로
 		//pipeline.addLast("readTimeoutHandler", new ReadTimeoutHandler(30)); // 데이터가 정해진 시간 내에 들어오지 않을 때
-		pipeline.addLast(new IdleStateHandler(10, 0, 0)); // 서버에서 응답이 없을 때
+		pipeline.addLast(new IdleStateHandler(5, 0, 0)); // 서버에서 응답이 없을 때
 		pipeline.addLast("myHandler", new MyHandler());
 		pipeline.addLast(new ChatClientHandler()); // 이벤트 핸들러 등록
 		
