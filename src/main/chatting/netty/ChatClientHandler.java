@@ -35,8 +35,8 @@ public class ChatClientHandler extends ChannelInboundHandlerAdapter {
 		if(evt instanceof IdleStateEvent) {
 			IdleStateEvent e = (IdleStateEvent)evt;
 			if(e.state() == IdleState.READER_IDLE) {
-				System.out.println("서버 응답 없음");
-				ctx.close();
+				System.out.println("\n서버 응답 없음");
+				ctx.close(); // 채널 연결 해제?
 			}
 		}
 	}

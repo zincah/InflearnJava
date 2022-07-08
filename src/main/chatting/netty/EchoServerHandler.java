@@ -88,6 +88,7 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
 				channel.writeAndFlush("[" + incoming.remoteAddress() + "]" + message + "\n"); // channel에서 전달받은 메세지 값을 전송
 			}else {
 				//channel.write("잘못된 정보");
+				// 대기 처리를 해야하는데..
 			}
 			
 		}
