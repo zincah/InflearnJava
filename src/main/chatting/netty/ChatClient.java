@@ -29,7 +29,13 @@ public class ChatClient{
 	private byte[] length = new byte[10];
 	
 	public static void main(String[] args) throws Exception{
-		new ChatClient().run(); // run 메소드 실행
+		
+		try {
+			new ChatClient().run(); // run 메소드 실행
+		}catch(Exception e) {
+			System.out.println("종료"); // 그냥 강제 종료 버튼 눌렀을 때
+		}
+		 
 	}
 	
 	public void run() throws Exception{
@@ -64,26 +70,28 @@ public class ChatClient{
 				String line = br.readLine();
 				StringBuffer data = checkedDataProc(line);
 
-				//String line = br.readLine().trim(); // trim()으로 공백 제거 후 저장
-				if(line == null) break;
+				// bye 입력시 채팅 종료
+				if("bye".equals(line.toLowerCase())) {
+					channel.closeFuture().sync();
+					break;
+				}
+				
+				if("quit".equals(data)) {
+					break;
+				}
 				
 				// server로 전송
 				channelFuture = channel.writeAndFlush(data + "\n");
 
-				// bye 입력시 채팅 종료
-				if("bye".equals(line.toLowerCase())) {
-					channel.closeFuture().sync(); 
-					break;
-				}
-				
-				if(channelFuture.isDone()){ 
-					System.out.println("채널 접속이 끊겼습니다.");
+				if(channelFuture.isDone()){ // 이거 안됨
+					System.out.println("채널 접속이 끊겼습니다. 다시 데이터를 입력하면 재접속을 시도합니다.");
 				}
 				
 			}
 			
 			// 모든 메세지가 flush 될때까지 기다린다.
 			if(channelFuture != null) {
+				System.out.println("flush");
 				channelFuture.sync(); 
 			}
 
@@ -96,28 +104,33 @@ public class ChatClient{
 	
 	public StringBuffer checkedDataProc(String line) throws Exception {
 		
-		byte[] bytes = line.getBytes("euc-kr");
-		String len = String.valueOf(bytes.length);
-		
-		char[] lenArray = new char[len.length()];
-		
-		for(int i=0; i<len.length(); i++) {
-			char su = len.charAt(i);
-			lenArray[i] = su;
-		}
+		if(line == null) {
+			StringBuffer sb = new StringBuffer();
+			sb.append("quit");
+			return sb;
+		}else {
+			byte[] bytes = line.getBytes("euc-kr");
+			String len = String.valueOf(bytes.length);
+			
+			char[] lenArray = new char[len.length()];
+			
+			for(int i=0; i<len.length(); i++) {
+				char su = len.charAt(i);
+				lenArray[i] = su;
+			}
 
-		StringBuffer sb = new StringBuffer();
-		for(int i=0; i<10-len.length(); i++) {
-			sb.append("0");
+			StringBuffer sb = new StringBuffer();
+			for(int i=0; i<10-len.length(); i++) {
+				sb.append("0");
+			}
+			
+			for(char ch : lenArray) {
+				sb.append(String.valueOf(ch));
+			}
+			
+			sb.append(new String(bytes, "euc-kr"));
+			//sb.append("아");
+			return sb;
 		}
-		
-		for(char ch : lenArray) {
-			sb.append(String.valueOf(ch));
-		}
-		
-		sb.append(new String(bytes, "euc-kr"));
-		//sb.append("아");
-		return sb;
-
 	}
 }

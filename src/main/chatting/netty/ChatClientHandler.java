@@ -41,6 +41,8 @@ public class ChatClientHandler extends ChannelInboundHandlerAdapter {
 		}
 	}
 
+
+
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		
