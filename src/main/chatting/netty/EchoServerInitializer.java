@@ -11,11 +11,15 @@ import io.netty.handler.ssl.SslContext;
 
 
 public class EchoServerInitializer extends ChannelInitializer<SocketChannel> {
-	
+	/*
 	private final SslContext sslCtx;
 
 	public EchoServerInitializer(SslContext sslCtx) {
 		this.sslCtx = sslCtx;
+	}*/
+	
+	public EchoServerInitializer() {
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override

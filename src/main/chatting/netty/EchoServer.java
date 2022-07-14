@@ -20,13 +20,10 @@ public class EchoServer {
 	}
 	
 	public static void main(String[] args) throws Exception{
-		new EchoServer(8888).run();
+		new EchoServer(11100).run();
 	}
 	
 	public void run() throws Exception{
-		SelfSignedCertificate ssc = new SelfSignedCertificate();
-		SslContext sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
-
 		// nio 처리를 다루는 이벤트 루프 인스턴스 생성
 		// 매개변수에 1이 주어지는 경우 단일 스레드로 동작하는 객체
 		// 매개변수가 주어지지 않으면 cpu 코어 수에 따라 설정
@@ -38,7 +35,7 @@ public class EchoServer {
 			bootstrap.group(bossGroup, workerGroup) // group 할당
 				.channel(NioServerSocketChannel.class) // NioServerSocketChannel 채널 사용
 				.handler(new LoggingHandler(LogLevel.INFO)) // log찍히는 단계 info로 해서 적용(console)
-				.childHandler(new EchoServerInitializer(sslCtx)); // 핸들러 등록
+				.childHandler(new EchoServerInitializer()); // 핸들러 등록
 			
 			bootstrap.bind(port).sync().channel().closeFuture().sync();
 			// 서버 소켓에 포트를 바인딩

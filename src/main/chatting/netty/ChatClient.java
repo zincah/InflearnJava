@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.nio.channels.ClosedChannelException;
 import java.util.concurrent.TimeUnit;
 
+import data.parse.ChangeData;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -26,8 +27,8 @@ public class ChatClient{
 	// -> 어플리케이션이 수행할 동작을 지정
 	// -> 프로그램에 대한 각종 설정을 지정
 	
-	static final String HOST = System.getProperty("server", "192.168.1.156"); // server ip 연결
-	static final int PORT = Integer.parseInt(System.getProperty("port", "8888")); // port 연결
+	static final String HOST = System.getProperty("server", "192.168.1.200"); // server ip 연결
+	static final int PORT = Integer.parseInt(System.getProperty("port", "11010")); // port 연결
 	static final int RECONNECT_DELAY = Integer.parseInt(System.getProperty("reconnectDelay", "5"));
 	
 	// 전문
@@ -68,11 +69,32 @@ public class ChatClient{
 			// 보낼 메세지 입력
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 			
-			while(channel.isActive()) { // 재접속하면 두번 돌아감 이걸 어떻게 멈추지...
-
+			while(channel.isActive()) { 
+				// 재접속하면 두번 돌아감 이걸 어떻게 멈추지...
+				// 왜 프린트 두번..왜...왱.....왜....왜...
+				
 				Thread.sleep(1000);
-				System.out.print("데이터 입력 : "); // 왜 한번 더 쳐야하는지를 모르겠음ㅜ
-				String line = br.readLine();
+
+				System.out.println("데이터를 입력하세요.\n");
+
+				
+				System.out.print("[인터페이스 id] = ");
+				String if_idStr = br.readLine();
+				
+				System.out.print("[이름] = ");
+				String nameStr = br.readLine();
+				
+				System.out.print("[계좌번호] = ");
+				String accountStr = br.readLine();
+				
+				System.out.print("[핸드폰 번호] = ");
+				String phoneStr = br.readLine();
+				
+				ChangeData cd = new ChangeData();
+				StringBuffer tempBuf = cd.makeData(if_idStr, nameStr, accountStr, phoneStr);
+
+				//System.out.print("데이터 입력 : "); // 왜 한번 더 쳐야하는지를 모르겠음ㅜ
+				String line = tempBuf.toString();
 				StringBuffer data = checkedDataProc(line);
 
 				if(line == null) {
@@ -83,11 +105,6 @@ public class ChatClient{
 					channel.closeFuture().sync();
 					break;
 				}
-				/*
-				if("quit".equals(data)) {
-					channel.closeFuture().sync();
-					break;
-				}*/
 				
 				// server로 전송
 				channelFuture = channel.writeAndFlush(data + "\n");
@@ -105,7 +122,6 @@ public class ChatClient{
 	}
 	
 	// 길이부 부착하여 전송
-	
 	public StringBuffer checkedDataProc(String line) throws Exception {
 		
 		/*
