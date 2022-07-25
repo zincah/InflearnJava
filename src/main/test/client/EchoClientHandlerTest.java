@@ -19,6 +19,7 @@ public class EchoClientHandlerTest extends SimpleChannelInboundHandler<ByteBuf>{
 		 	System.out.println("~.~.~.~.~.~Successful connection with server~.~.~.~.~.~\n"); // 정상 연결 메세지
 		 	
 		 	StringBuffer sb = pushDatas(); // 데이터 setting
+		 	System.out.println(sb.toString());
 		 	ctx.writeAndFlush(Unpooled.copiedBuffer(sb.toString(), Charset.forName("euc-kr"))); // 채널 활성화 시 메시지 전송
 		 	
 	    }
